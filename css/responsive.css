@@ -19,18 +19,25 @@
     .flex-item {
         width: 100%;
     }
+    #restaurant-info {
+        padding: 0;
+    }
 }
 @media screen and (min-width: 1024px) {
     #restaurants-list li {
         width: calc(90% / 3);
     }
+    #restaurant-info {
+        padding: 0;
+    }
 }
 
 @media screen and (min-width: 1260px) {
-    .flex-item {
-        width: 50%;
+    #maincontent {
+        max-width: 1200px;
+        margin: auto;
     }
     #restaurant-info {
-        padding: 60px 20px;
+        padding: 0;
     }
 }

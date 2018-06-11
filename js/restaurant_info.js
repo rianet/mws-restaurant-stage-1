@@ -65,6 +65,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
+  image.alt = `Restaurant ${restaurant.name}`;
   image.src = `${imgPath}-800.jpg`;
   image.sizes = '(max-width: 960px) 50vw, 100vw';
   image.srcset = [`${imgPath}-400.jpg 400w`, `${imgPath}-800.jpg 800w`];
@@ -107,7 +108,7 @@ fillRestaurantHoursHTML = (
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h2');
+  const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
 
@@ -130,6 +131,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 createReviewHTML = review => {
   const li = document.createElement('li');
   const name = document.createElement('p');
+  name.className = 'reviewer-name';
   name.innerHTML = review.name;
   li.appendChild(name);
 
@@ -138,7 +140,11 @@ createReviewHTML = review => {
   li.appendChild(date);
 
   const rating = document.createElement('p');
-  rating.innerHTML = `Rating: ${review.rating}`;
+  rating.setAttribute('aria-label' , `Rated with ${review.rating} stars`);
+  rating.className = 'raiting';
+  for(let i = 0; i<review.rating; i++){
+    rating.innerHTML += '★';
+  }
   li.appendChild(rating);
 
   const comments = document.createElement('p');

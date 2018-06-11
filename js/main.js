@@ -168,8 +168,7 @@ createRestaurantHTML = restaurant => {
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
-  image.alt = 'Restaurant Image';
-  image.setAttribute('aria-label', `Restaurant ${restaurant.name} image`);
+  image.alt = `Restaurant ${restaurant.name}`;
   image.src = `${imgPath}-800.jpg`;
   image.sizes = '(max-width: 960px) 50vw, 100vw';
   image.srcset = [`${imgPath}-400.jpg 400w`, `${imgPath}-800.jpg 800w`];
@@ -180,7 +179,7 @@ createRestaurantHTML = restaurant => {
 
   li.append(picture);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
 
