@@ -1,4 +1,4 @@
-const staticCacheName = 'mws-restaurant-v1';
+const staticCacheName = 'mws-restaurant-v2';
 /**
  * Install service worker and cache assets
  */
