@@ -140,9 +140,9 @@ createReviewHTML = review => {
   li.appendChild(date);
 
   const rating = document.createElement('p');
-  rating.setAttribute('aria-label' , `Rated with ${review.rating} stars`);
+  rating.setAttribute('aria-label', `Rated with ${review.rating} stars`);
   rating.className = 'raiting';
-  for(let i = 0; i<review.rating; i++){
+  for (let i = 0; i < review.rating; i++) {
     rating.innerHTML += '★';
   }
   li.appendChild(rating);
