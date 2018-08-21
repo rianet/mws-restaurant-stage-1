@@ -16,14 +16,12 @@ document.addEventListener('DOMContentLoaded', event => {
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) {
-      // Got an error
-      console.error(error);
-    } else {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
-    }
+  fetch(`${baseUrl}neighborhoods`, {
+  }).then(neighborhoods => {
+    return neighborhoods.json();
+  }).then((data) => {
+    self.neighborhoods = data;
+    fillNeighborhoodsHTML();
   });
 };
 
@@ -91,21 +89,6 @@ window.initMap = () => {
 updateRestaurants = () => {
   const cuisine = getSelectedCusine();
   const neighborhood = getSelectedNeighborhood();
-
-  /*DBHelper.fetchRestaurantByCuisineAndNeighborhood(
-    cuisine,
-    neighborhood,
-    (error, restaurants) => {
-      if (error) {
-        // Got an error!
-        console.error(error);
-      } else {
-        console.log(restaurants);
-        resetRestaurants(restaurants);
-        fillRestaurantsHTML();
-      }
-    }
-  );*/
   fetch(`${baseUrl}restaurants`, {
   }).then(restaurants => {
     return restaurants.json();
