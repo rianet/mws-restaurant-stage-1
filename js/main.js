@@ -1,6 +1,8 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
+const baseUrl = 'http://localhost:1337/';
+
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
@@ -90,7 +92,7 @@ updateRestaurants = () => {
   const cuisine = getSelectedCusine();
   const neighborhood = getSelectedNeighborhood();
 
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(
+  /*DBHelper.fetchRestaurantByCuisineAndNeighborhood(
     cuisine,
     neighborhood,
     (error, restaurants) => {
@@ -98,11 +100,19 @@ updateRestaurants = () => {
         // Got an error!
         console.error(error);
       } else {
+        console.log(restaurants);
         resetRestaurants(restaurants);
         fillRestaurantsHTML();
       }
     }
-  );
+  );*/
+  fetch(`${baseUrl}restaurants`, {
+  }).then(restaurants => {
+    return restaurants.json();
+  }).then((data) => {
+    resetRestaurants(data);
+    fillRestaurantsHTML();
+  });
 };
 
 /*
