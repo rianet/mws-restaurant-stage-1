@@ -10,6 +10,13 @@ const baseUrl = 'http://localhost:1337/';
 document.addEventListener('DOMContentLoaded', event => {
   fetchNeighborhoods();
   fetchCuisines();
+
+  if (!('indexedDB' in window)) {
+    console.log('This browser doesn\'t support IndexedDB');
+    return;
+  }
+
+  var dbPromise = idb.open('restaurant-db', 1);
 });
 
 /**
