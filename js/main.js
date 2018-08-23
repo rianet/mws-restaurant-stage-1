@@ -2,27 +2,14 @@ let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
 
-/**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
- */
-document.addEventListener('DOMContentLoaded', event => {
-  fetchNeighborhoods();
-  fetchCuisines();
-});
+DBHelper._dbPromise = DBHelper.openDatabase();
 
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) {
-      // Got an error
-      console.error(error);
-    } else {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
-    }
-  });
+  self.neighborhoods = DBHelper.fetchNeighborhoods();
+  fillNeighborhoodsHTML();
 };
 
 /**
@@ -42,15 +29,8 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
-    if (error) {
-      // Got an error!
-      console.error(error);
-    } else {
-      self.cuisines = cuisines;
-      fillCuisinesHTML();
-    }
-  });
+  self.cuisines = DBHelper.fetchCuisines();
+  fillCuisinesHTML();
 };
 
 /**
@@ -80,8 +60,37 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  updateRestaurants();
+
+  showCachedRestaurants();
 };
+
+/**
+ * Display cached restaurants
+ */
+showCachedRestaurants = () => {
+  DBHelper._dbPromise.then((db) => {
+    if (!db) return;
+
+    var index = db.transaction('restaurants')
+      .objectStore('restaurants');
+
+    index.getAll().then((data) => {
+      if(data.length){
+        DBHelper.restaurantData = data;
+        fetchCuisines();
+        fetchNeighborhoods();
+        updateRestaurants();
+      }else{
+         // If no cached data on indexedDB fetch from server
+        DBHelper.fetchRestaurants().then(() => {
+          fetchCuisines();
+          fetchNeighborhoods();
+          updateRestaurants();
+        });
+      }
+    });
+  });
+}
 
 /**
  * Update page and map for current restaurants.
@@ -89,20 +98,12 @@ window.initMap = () => {
 updateRestaurants = () => {
   const cuisine = getSelectedCusine();
   const neighborhood = getSelectedNeighborhood();
-
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(
+  const restaurants = DBHelper.fetchRestaurantByCuisineAndNeighborhood(
     cuisine,
-    neighborhood,
-    (error, restaurants) => {
-      if (error) {
-        // Got an error!
-        console.error(error);
-      } else {
-        resetRestaurants(restaurants);
-        fillRestaurantsHTML();
-      }
-    }
+    neighborhood
   );
+  resetRestaurants(restaurants);
+  fillRestaurantsHTML();
 };
 
 /*
