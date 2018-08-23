@@ -1,6 +1,5 @@
 let restaurant;
 var map;
-const baseUrl = 'http://localhost:1337/';
 
 /**
  * Initialize Google map, called from HTML.
@@ -37,14 +36,8 @@ fetchRestaurantFromURL = callback => {
     error = 'No restaurant id in URL';
     callback(error, null);
   } else {
-    fetch(`${baseUrl}restaurants/${id}`, {
-    }).then(restaurant => {
-      return restaurant.json();
-    }).then((data) => {
-      self.restaurant = data;
-      fillRestaurantHTML();
-      callback(null, self.restaurant);
-    });
+    self.restaurant = DBHelper.fetchRestaurantById(id);
+    fillRestaurantHTML();
   }
 };
 
