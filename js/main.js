@@ -1,37 +1,28 @@
 let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
-const baseUrl = 'http://localhost:1337/';
 
+DBHelper._dbPromise = openDatabase();
 
-/**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
- */
-document.addEventListener('DOMContentLoaded', event => {
-  fetchNeighborhoods();
-  fetchCuisines();
-
-  if (!('indexedDB' in window)) {
-    console.log('This browser doesn\'t support IndexedDB');
-    return;
+function openDatabase() {
+  // If the browser doesn't support service worker, no need to use indexedDB
+  if (!navigator.serviceWorker) {
+    return Promise.resolve();
   }
 
-  var dbPromise = idb.open('restaurant-db', 1);
-});
+  return idb.open('restaurants-db', 1, upgradeDB => {
+    var store = upgradeDB.createObjectStore('restaurants', {
+      keyPath: 'id'
+    });
+  });
+}
 
 /**
  * Fetch all neighborhoods and set their HTML.
  */
 fetchNeighborhoods = () => {
-  DBHelper.fetchNeighborhoods((error, neighborhoods) => {
-    if (error) {
-      // Got an error
-      console.error(error);
-    } else {
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
-    }
-  });
+  self.neighborhoods = DBHelper.fetchNeighborhoods();
+  fillNeighborhoodsHTML();
 };
 
 /**
@@ -51,15 +42,8 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
  * Fetch all cuisines and set their HTML.
  */
 fetchCuisines = () => {
-  DBHelper.fetchCuisines((error, cuisines) => {
-    if (error) {
-      // Got an error!
-      console.error(error);
-    } else {
-      self.cuisines = cuisines;
-      fillCuisinesHTML();
-    }
-  });
+  self.cuisines = DBHelper.fetchCuisines();
+  fillCuisinesHTML();
 };
 
 /**
@@ -89,8 +73,37 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  updateRestaurants();
+
+  showCachedRestaurants();
 };
+
+/**
+ * Display cached restaurants
+ */
+showCachedRestaurants = () => {
+  DBHelper._dbPromise.then((db) => {
+    if (!db) return;
+
+    var index = db.transaction('restaurants')
+      .objectStore('restaurants');
+
+    index.getAll().then((data) => {
+      if(data.length){
+        DBHelper.restaurantData = data;
+        fetchCuisines();
+        fetchNeighborhoods();
+        updateRestaurants();
+      }else{
+         // If no cached data on indexedDB fetch from server
+        DBHelper.fetchRestaurants().then(() => {
+          fetchCuisines();
+          fetchNeighborhoods();
+          updateRestaurants();
+        });
+      }
+    });
+  });
+}
 
 /**
  * Update page and map for current restaurants.
@@ -98,13 +111,12 @@ window.initMap = () => {
 updateRestaurants = () => {
   const cuisine = getSelectedCusine();
   const neighborhood = getSelectedNeighborhood();
-  fetch(`${baseUrl}restaurants`, {
-  }).then(restaurants => {
-    return restaurants.json();
-  }).then((data) => {
-    resetRestaurants(data);
-    fillRestaurantsHTML();
-  });
+  const restaurants = DBHelper.fetchRestaurantByCuisineAndNeighborhood(
+    cuisine,
+    neighborhood
+  );
+  resetRestaurants(restaurants);
+  fillRestaurantsHTML();
 };
 
 /*

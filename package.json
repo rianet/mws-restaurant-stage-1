@@ -23,5 +23,8 @@
   "homepage": "https://github.com/rianet/mws-restaurant-stage-1#readme",
   "dependencies": {
     "idb": "^2.1.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1"
   }
 }
