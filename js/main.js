@@ -2,20 +2,7 @@ let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
 
-DBHelper._dbPromise = openDatabase();
-
-function openDatabase() {
-  // If the browser doesn't support service worker, no need to use indexedDB
-  if (!navigator.serviceWorker) {
-    return Promise.resolve();
-  }
-
-  return idb.open('restaurants-db', 1, upgradeDB => {
-    var store = upgradeDB.createObjectStore('restaurants', {
-      keyPath: 'id'
-    });
-  });
-}
+DBHelper._dbPromise = DBHelper.openDatabase();
 
 /**
  * Fetch all neighborhoods and set their HTML.

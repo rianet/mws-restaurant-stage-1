@@ -19,6 +19,19 @@ class DBHelper {
     return `http://localhost:${port}/`;
   }
 
+  static openDatabase() {
+    // If the browser doesn't support service worker, no need to use indexedDB
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+  
+    return idb.open('restaurants-db', 1, upgradeDB => {
+      var store = upgradeDB.createObjectStore('restaurants', {
+        keyPath: 'id'
+      });
+    });
+  }
+
    /**
    * Fetch all restaurants.
    */

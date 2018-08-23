@@ -1,5 +1,6 @@
 let restaurant;
 var map;
+DBHelper._dbPromise = DBHelper.openDatabase();
 
 /**
  * Initialize Google map, called from HTML.
@@ -25,20 +26,18 @@ window.initMap = () => {
  * Get current restaurant from page URL.
  */
 fetchRestaurantFromURL = callback => {
-  if (self.restaurant) {
-    // restaurant already fetched!
-    callback(null, self.restaurant);
-    return;
-  }
-  const id = getParameterByName('id');
-  if (!id) {
-    // no id found in URL
-    error = 'No restaurant id in URL';
-    callback(error, null);
-  } else {
-    self.restaurant = DBHelper.fetchRestaurantById(id);
-    fillRestaurantHTML();
-  }
+  DBHelper._dbPromise.then((db) => {
+    var index = db.transaction('restaurants')
+      .objectStore('restaurants');
+
+    index.getAll().then((data) => {
+      DBHelper.restaurantData = data;
+      const id = getParameterByName('id');
+      self.restaurant = DBHelper.fetchRestaurantById(id);
+      callback(null, self.restaurant);
+      fillRestaurantHTML();   
+    });
+  });
 };
 
 /**
