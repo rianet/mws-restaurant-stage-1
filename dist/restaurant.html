@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Main CSS file -->
+  <link rel="stylesheet" href="css/styles-min.css" type="text/css">
+  <title>Restaurant Info</title>
+</head>
+
+<body class="inside">
+  <!-- Beginning header -->
+  <header>
+    <!-- Beginning nav -->
+    <nav>
+      <h1>
+        <a href="/">Restaurant Reviews</a>
+      </h1>
+    </nav>
+    <!-- Beginning breadcrumb -->
+    <nav arial-label="Breadcrumb">
+      <ul id="breadcrumb">
+        <li>
+          <a href="/">Home</a>
+        </li>
+      </ul>
+    </nav>
+    <!-- End breadcrumb -->
+    <!-- End nav -->
+  </header>
+  <!-- End header -->
+
+  <!-- Beginning main -->
+  <main id="maincontent">
+    <!-- Beginning map -->
+    <section id="map-container">
+      <div id="map" role="presentation" aria-label="Map with restaurant location"></div>
+    </section>
+    <!-- End map -->
+    <!-- Beginning restaurant -->
+    <section id="restaurant-container">
+      <div class="flex-container">
+        <div class="flex-item">
+          <h2 id="restaurant-name"></h2>
+          <picture>
+            <source id="source-webp" type="image/webp"></source>
+            <img id="restaurant-img" alt="restaurant image">
+            <p id="restaurant-cuisine"></p>
+          </picture>
+        </div>
+        <div id="restaurant-info" class="flex-item">
+          <p id="restaurant-address"></p>
+          <table id="restaurant-hours"></table>
+        </div>
+      </div>
+    </section>
+    <!-- end restaurant -->
+    <!-- Beginning reviews -->
+    <section id="reviews-container" aria-label="Restaurant review">
+      <ul id="reviews-list"></ul>
+    </section>
+    <!-- End reviews -->
+  </main>
+  <!-- End main -->
+
+  <!-- Beginning footer -->
+  <footer id="footer">
+    Copyright (c) 2017
+    <a href="/">
+      <strong>Restaurant Reviews</strong>
+    </a> All Rights Reserved.
+  </footer>
+  <!-- End footer -->
+
+  <!-- Beginning scripts -->
+  <script type="application/javascript" charset="utf-8" src="js/idb-min.js"></script>
+  <script type="text/javascript" src="js/dbhelper-min.js"></script>
+  <script type="text/javascript" src="js/restaurant_info-min.js"></script>
+  <!-- Google Maps -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6GqkuU1bLiv1Xyapf8zPqIvZPpvgXstE&libraries=places&callback=initMap"></script>
+  <!-- End scripts -->
+
+</body>
+
+</html>

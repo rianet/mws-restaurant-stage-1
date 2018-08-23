@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="Description" content="Discover and review the greatest restaurants in your area.">
+  <meta name="theme-color" content="#207cbb"/>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="css/styles-min.css">
+  <title>Restaurant Reviews</title>
+</head>
+
+<body>
+  <header>
+    <nav>
+      <h1>
+        <a href="/">Restaurant Reviews</a>
+      </h1>
+    </nav>
+  </header>
+
+  <main id="maincontent">
+    <section id="map-container">
+      <div id="map" role="presentation" aria-label="Map with restaurants"></div>
+    </section>
+    <section>
+      <div class="filter-options">
+        <h2>Filter Results</h2>
+        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()" aria-label="Select neighborhood">
+          <option value="all">All Neighborhoods</option>
+        </select>
+        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()" aria-label="Select cuisine type">
+          <option value="all">All Cuisines</option>
+        </select>
+      </div>
+      <ul id="restaurants-list"></ul>
+    </section>
+  </main>
+  <script type="application/javascript" charset="utf-8" src="js/idb-min.js"></script>
+  <script type="application/javascript" charset="utf-8" src="js/dbhelper-min.js"></script>
+  <script type="application/javascript" charset="utf-8" src="js/main-min.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6GqkuU1bLiv1Xyapf8zPqIvZPpvgXstE&libraries=places&callback=initMap"></script>
+  
+
+  <footer id="footer">
+    Copyright (c) 2017
+    <a href="/">
+      <strong>Restaurant Reviews</strong>
+    </a> All Rights Reserved.
+  </footer>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then(function () { console.log("Service Worker Registered"); })
+        .catch(function (error) { console.log('Registration failed with ' + error); });
+    }
+  </script>
+
+</body>
+
+</html>
