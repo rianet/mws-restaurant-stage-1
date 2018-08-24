@@ -11,7 +11,7 @@ For Stage 2 we focused on performance, we fetch Restaurants from API and used in
 `Performance: >70`
 `Accessibility: >90`
 
-### Running this Project
+## Running this Project
 
 ### Prerequisites
 1. [Node](https://nodejs.org/en/) v8.x+
