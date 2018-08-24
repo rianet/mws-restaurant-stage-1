@@ -42,23 +42,13 @@
   <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6GqkuU1bLiv1Xyapf8zPqIvZPpvgXstE&libraries=places&callback=initMap"></script>
+  <script type="application/javascript" charset="utf-8" src="js/offline.js"></script>
   
-
   <footer id="footer">
     Copyright (c) 2017
     <a href="/">
       <strong>Restaurant Reviews</strong>
     </a> All Rights Reserved.
   </footer>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(function () { console.log("Service Worker Registered"); })
-        .catch(function (error) { console.log('Registration failed with ' + error); });
-    }
-  </script>
-
 </body>
-
 </html>

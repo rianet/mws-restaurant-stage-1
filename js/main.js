@@ -160,25 +160,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = restaurant => {
   const li = document.createElement('li');
 
-  const picture = document.createElement('picture');
-  const imgPath = DBHelper.imageUrlForRestaurant(restaurant);
-
-  const sourceWebp = document.createElement('source');
-  sourceWebp.type = 'image/webp';
-  sourceWebp.srcset = `${imgPath}.webp`;
-
-  const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.alt = `Restaurant ${restaurant.name}`;
-  image.src = `${imgPath}-800.jpg`;
-  image.sizes = '(max-width: 960px) 50vw, 100vw';
-  image.srcset = [`${imgPath}-400.jpg 400w`, `${imgPath}-800.jpg 800w`];
-
-  // Append sources to picrure
-  picture.append(sourceWebp);
-  picture.append(image);
-
-  li.append(picture);
+  li.append(createImg(restaurant));
 
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
@@ -199,6 +181,28 @@ createRestaurantHTML = restaurant => {
   li.append(more);
 
   return li;
+};
+
+createImg = restaurant => {
+  const picture = document.createElement('picture');
+  const imgPath = DBHelper.imageUrlForRestaurant(restaurant);
+
+  const sourceWebp = document.createElement('source');
+  sourceWebp.type = 'image/webp';
+  sourceWebp.srcset = `${imgPath}.webp`;
+
+  const image = document.createElement('img');
+  image.className = 'restaurant-img';
+  image.alt = `Restaurant ${restaurant.name}`;
+  image.src = `${imgPath}-800.jpg`;
+  image.sizes = '(max-width: 960px) 50vw, 100vw';
+  image.srcset = [`${imgPath}-400.jpg 400w`, `${imgPath}-800.jpg 800w`];
+
+  // Append sources to picrure
+  picture.append(sourceWebp);
+  picture.append(image);
+
+  return picture;
 };
 
 /**
