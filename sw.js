@@ -1,81 +1,50 @@
-const staticCacheName = 'mws-restaurant-v3';
-/**
- * Install service worker and cache assets
- */
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(staticCacheName)
-     .then( cache => {
-      return cache.addAll([
-        'index.html',
-        'restaurant.html',
-        'js/idb.js',
-        'js/main.js',
-        'js/restaurant_info.js',
-        'js/dbhelper.js',
-        'css/styles.css',
-        'img/1-400.jpg',
-        'img/1-800.jpg',
-        'img/1.webp',
-        'img/2-400.jpg',
-        'img/2-800.jpg',
-        'img/2.webp',
-        'img/3-400.jpg',
-        'img/3-800.jpg',
-        'img/3.webp',
-        'img/4-400.jpg',
-        'img/4-800.jpg',
-        'img/4.webp',
-        'img/5-400.jpg',
-        'img/5-800.jpg',
-        'img/5.webp',
-        'img/6-400.jpg',
-        'img/6-800.jpg',
-        'img/6.webp',
-        'img/7-400.jpg',
-        'img/7-800.jpg',
-        'img/7.webp',
-        'img/8-400.jpg',
-        'img/8-800.jpg',
-        'img/8.webp',
-        'img/9-400.jpg',
-        'img/9-800.jpg',
-        'img/9.webp',
-        'img/10-400.jpg',
-        'img/10-800.jpg',
-        'img/9.webp',
-      ])
-      .then(() => self.skipWaiting());
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/3.4.1/workbox-sw.js');
+const {strategies} = workbox;
+console.log('Hello from Workbox!');
+
+if (workbox) {
+  // Cache JS
+  workbox.routing.registerRoute(
+    new RegExp('.*\.js'),
+    workbox.strategies.cacheFirst({
+      cacheName: 'js-cache'})
+  );
+  // Cache HTML
+  workbox.routing.registerRoute(
+    new RegExp('.*\.html'),
+    workbox.strategies.cacheFirst({
+      cacheName: 'html-cache',
     })
   );
-});
-
-/*
- * activate service worker, get latest cache and delete old ones
- */
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then( cacheNames => {
-      return Promise.all(
-        cacheNames.filter( cacheName => {
-          return cacheName.startsWith('mws-restaurant-') &&
-                 cacheName !== staticCacheName;
-        }).map( cacheName => {
-          return caches.delete(cacheName);
+  // Cache CSS
+  workbox.routing.registerRoute(
+    new RegExp('/.*\.css/'),
+    workbox.strategies.cacheFirst({
+      cacheName: 'css-cache',
+    })
+  );
+  // Cache Imgs
+  workbox.routing.registerRoute(
+    new RegExp('/.*\.(?:png|jpg|jpeg|svg|gif|webp)/'),
+    workbox.strategies.cacheFirst({
+      cacheName: 'image-cache',
+      plugins: [
+        new workbox.expiration.Plugin({
+          maxEntries: 30,
+          // Cache for a maximum of a week
+          maxAgeSeconds: 7 * 24 * 60 * 60,
         })
-      );
+      ],
     })
   );
-});
+} else {
+  console.log(`Boo! Workbox didn't load 😬`);
+}
 
-/**
- * Intercept requests and fetch them from cache first with network fallback
- */
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        return response || fetch(event.request);
-      })
-  );
+// When offline intercept http calls and respond with cache
+self.addEventListener('fetch', (event) => {
+  if (event.request.url) {
+    const cacheFirst = strategies.cacheFirst();
+    event.respondWith(cacheFirst.makeRequest({request: event.request}));
+  }
 });
