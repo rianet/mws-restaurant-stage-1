@@ -2,11 +2,13 @@
  * Common database helper functions.
  */
 class DBHelper {
-  
+
   constructor() {
     this.restaurantData = {};
+    this.reviewsData = {};
     this.dbPromise = idb.open('restaurants-db', 1, upgradeDB => {
       upgradeDB.createObjectStore('restaurants', { keyPath: 'id' });
+      upgradeDB.createObjectStore('reviews', { keyPath: 'id' });
     });
   }
 
@@ -24,32 +26,36 @@ class DBHelper {
     if (!navigator.serviceWorker) {
       return Promise.resolve();
     }
-  
+
     return idb.open('restaurants-db', 1, upgradeDB => {
-      var store = upgradeDB.createObjectStore('restaurants', {
+      let store = upgradeDB.createObjectStore('restaurants', {
+        keyPath: 'id'
+      });
+
+      let storeReviews = upgradeDB.createObjectStore('reviews', {
         keyPath: 'id'
       });
     });
   }
 
-   /**
-   * Fetch all restaurants.
-   */
+  /**
+  * Fetch all restaurants.
+  */
   static fetchRestaurants(callback) {
-    var promise = new Promise(function(resolve, reject) {
+    let promise = new Promise((resolve, reject) => {
       fetch(`${DBHelper.DATABASE_URL}restaurants`, {
       }).then(restaurants => {
-        return restaurants.json();      
+        return restaurants.json();
       }).then((data) => {
         // Store restaurants on indexedDB
-        DBHelper._dbPromise.then(function(db) {
+        DBHelper._dbPromise.then((db) => {
           if (!db) return;
-          var tx = db.transaction('restaurants', 'readwrite');
-          var store = tx.objectStore('restaurants');
+          let tx = db.transaction('restaurants', 'readwrite');
+          let store = tx.objectStore('restaurants');
           data.forEach((item) => {
             store.put(item);
           });
-    
+
           DBHelper.restaurantData = data;
         });
         resolve(data);
@@ -69,7 +75,7 @@ class DBHelper {
    * Fetch restaurants by a cuisine type with proper error handling.
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
-        // Filter restaurants to have only given cuisine type
+    // Filter restaurants to have only given cuisine type
     return DBHelper.restaurantData.filter(r => r.cuisine_type == cuisine);
   }
 
@@ -87,7 +93,7 @@ class DBHelper {
     cuisine,
     neighborhood
   ) {
-    if(DBHelper.restaurantData !== undefined) {
+    if (DBHelper.restaurantData !== undefined) {
       let results = DBHelper.restaurantData;
       if (cuisine !== 'all') {
         // filter by cuisine
@@ -96,8 +102,8 @@ class DBHelper {
       if (neighborhood !== 'all') {
         // filter by neighborhood
         results = results.filter(r => r.neighborhood == neighborhood);
-      }       
-     return results;
+      }
+      return results;
     }
   }
 
@@ -105,7 +111,7 @@ class DBHelper {
    * Fetch all neighborhoods with proper error handling.
    */
   static fetchNeighborhoods(callback) {
-    if(DBHelper.restaurantData !== undefined) {
+    if (DBHelper.restaurantData !== undefined) {
       // Get all neighborhoods from all restaurants
       const neighborhoods = this.restaurantData.map((v) => v.neighborhood);
 
@@ -118,10 +124,10 @@ class DBHelper {
    * Fetch all cuisines with proper error handling.
    */
   static fetchCuisines(callback) {
-    if(DBHelper.restaurantData !== undefined) {
+    if (DBHelper.restaurantData !== undefined) {
       // Get all cuisines from all restaurants
       const cuisines = this.restaurantData.map((v, i) => v.cuisine_type);
-      
+
       // Remove duplicates from cuisines
       return cuisines.filter((v, i) => cuisines.indexOf(v) == i);
     }
@@ -153,5 +159,109 @@ class DBHelper {
       animation: google.maps.Animation.DROP
     });
     return marker;
+  }
+
+  /**
+   * Mark a restaurant ad favorite
+   */
+  static favoriteRestaurant(restaurant) {
+    let promise = new Promise((resolve, reject) => {
+      DBHelper._dbPromise.then((db) => {
+        if (!db) return;
+        let tx = db.transaction('restaurants', 'readwrite');
+        let store = tx.objectStore('restaurants');
+        restaurant.is_favorite = !restaurant.is_favorite;
+        store.put(restaurant);
+        resolve(restaurant);
+      });
+    });
+    return promise;
+  }
+
+  /**
+   * Fetch all restaurant reviews.
+   */
+  static fetchReviews(callback) {
+    let promise = new Promise((resolve, reject) => {
+      fetch(`${DBHelper.DATABASE_URL}reviews`, {
+      }).then(reviews => {
+        return reviews.json();
+      }).then((data) => {
+        // Store reviews on indexedDB
+        DBHelper._dbPromise.then((db) => {
+          if (!db) return;
+          let tx = db.transaction('reviews', 'readwrite');
+          let store = tx.objectStore('reviews');
+          data.forEach((item) => {
+            store.put(item);
+          });
+
+          DBHelper.reviewsData = data;
+        });
+        resolve(data);
+      });
+    });
+    return promise;
+  }
+
+  /**
+   * Fetch a reviews by restaurant id
+   */
+  static fetchReviewsByRestaurantId(restaurant_id, callback) {
+    return DBHelper.reviewsData.filter(r => r.restaurant_id == restaurant_id);
+  }
+
+  /**
+   * Stores review on idexedDB
+   */
+  static storeReviewIDB(review) {
+    let promise = new Promise((resolve, reject) => {
+      DBHelper._dbPromise.then((db) => {
+        if (!db) return;
+        let tx = db.transaction('reviews', 'readwrite');
+        let store = tx.objectStore('reviews');
+        store.put(review);
+        resolve(review);
+      });
+    });
+    return promise;
+  }
+
+  /**
+   * Sync up list of reviews with server and update status on IndexedDB
+   */
+  static syncUpReviews(reviews) {
+    for (let review of reviews) {
+      // Post review to the server
+      this.postReview(review);
+
+      // Update review as synced up true
+      review.syncUp = true;
+      this.storeReviewIDB(review);
+    }
+  }
+
+  /**
+   * Post a review to server
+   */
+  static postReview(data) {
+    return fetch(`${DBHelper.DATABASE_URL}reviews`, {
+      method: 'POST',
+      redirect: 'manual',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data),
+    }).then(response => {
+      return response.text();
+    })
+  }
+
+  static showNotification(msj) {
+    const notif = document.getElementById('notifications');
+    notif.style.display = 'block';
+    notif.innerHTML = '';
+    notif.innerHTML = msj;
+    setTimeout(() => { notif.style.display = 'none'; }, 3000);
   }
 }
