@@ -182,7 +182,7 @@ nav h1 a {
   font-family: Arial,sans-serif;
   margin: 15px auto;
   min-height: 380px;
-  padding: 10px;
+  padding: 0 10px 10px 10px;
   text-align: left;
   width: 90%;
   display: inline-block;
@@ -195,6 +195,9 @@ nav h1 a {
   max-width: 100%;
   min-height: 248px;
   min-width: 100%;
+  top: -30px;
+  position: relative;
+  z-index: 0;
 }
 #restaurants-list li h2 {
   color: #207cbb;
@@ -221,6 +224,52 @@ nav h1 a {
   text-decoration: none;
   text-transform: uppercase;
   width: 100%;
+  letter-spacing: 2px;
+}
+
+.favorite-restaurant {
+  border: 3px solid #207cbb !important;
+  background: linear-gradient(45deg, rgba(66,133,244,0.12)  90%, #207cbb 90%);
+}
+
+.favorite-button {
+    float: right;
+    top: -5px;
+    right: -20px;
+    font-size: 40px;
+    position: relative;
+    background: transparent;
+    border: none;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+.favorite-button:hover {
+  opacity: 0.9;
+}
+
+.favorite-button-selected {
+  color: red;
+  display: block;
+}
+
+.favorite-button-not-selected {
+  color: rgba(0, 0, 0, 0.67);
+}
+
+.details-favorite-restaurant {
+  border: 3px solid #207cbb !important;
+  background: linear-gradient(45deg, rgba(66,133,244,0.12)  95%, #207cbb 95%);
+}
+
+#details-favorite-btn{
+  float: right;
+  color: red;
+  margin-top: -22px;
+  margin-right: -8px;
+  display: none;
 }
 
 /* ====================== Restaurant Details ====================== */
@@ -279,6 +328,7 @@ nav h1 a {
   display: inline-block;
   align-items: center;
 }
+
 #reviews-container h3 {
   font-family: Arial,sans-serif;
   font-size: 20pt;
@@ -322,20 +372,59 @@ nav h1 a {
 #restaurant-hours td {
   color: #666;
 }
+/* ====================== Reviews Form  ====================== */
+#review-form {
+  display: none;
+  margin-top: 10px;
+}
+#review-form input, textarea, select, button {
+  width: 100%;
+  min-height: 35px;
+  margin: 0;
+  padding: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+  color: #333;
+  line-height: 1.5;
+}
+#review-form label{
+  font-weight: bold;
+  margin-top: 10px;
+  display: block;
+}
+#reviews-container button{
+  background: #207cbb;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+#reviews-container button:hover{
+  opacity: 0.9;
+}
+#notifications {
+  position: fixed;
+  bottom: 0;
+  padding: 10px;
+  width: 100%;
+  background: #eaea70;
+  border: solid 1px #989898;
+  font-weight: bold;
+  display: none;
+}
 
-/****** Responsive Styles */
+/* ================== Responsive Styles ====================== */
 @media screen and (min-width: 700px) {
   #restaurants-list li{ 
       width: calc(90% / 2);
   }
   .flex-item {
-      width: 50%;
-  }
-  #restaurant-info {
-      padding: 60px 20px;
+      width: 100%;
   }
 }
-@media screen and (min-width: 960px) {
+@media screen and (min-width: 760px) {
   #restaurant-container {
       width: 60%;
   }

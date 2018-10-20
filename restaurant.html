@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="Description" content="Discover and review the greatest restaurants in your area.">
-  <meta name="theme-color" content="#207cbb"/>
+  <meta name="theme-color" content="#207cbb" />
   <link rel="manifest" href="/manifest.json">
   <!-- Main CSS file -->
   <link rel="stylesheet" href="css/styles.css" type="text/css">
@@ -48,10 +48,11 @@
         <div class="flex-item">
           <h2 id="restaurant-name"></h2>
           <picture>
-            <source id="source-webp" type="image/webp"></source>
+            <source id="source-webp" type="image/webp">
+            </source>
             <img id="restaurant-img" alt="restaurant image">
-            <p id="restaurant-cuisine"></p>
           </picture>
+          <p id="restaurant-cuisine"></p>
         </div>
         <div id="restaurant-info" class="flex-item">
           <p id="restaurant-address"></p>
@@ -62,9 +63,31 @@
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container" aria-label="Restaurant review">
+      <button id="btn-favorite-this" onClick="favoriteRestaurant()">❤ Favorite Restaurant</button>
+      <button id="btn-show-review-form" onClick="showReviewForm()">☆ Rate Restaurant</button>
+      <form id="review-form">
+        <label aria-label="label-name">Name:</label>
+        <input type="text" name="name" id="txt-name" required aria-labelledby="label-name" />
+        <br>
+        <label aria-label="label-raiting">Rating:</label>
+        <select name="raiting" id="select-raiting" size="5" required aria-labelledby="label-raiting">
+          <option value="5">5 &#9734; - I Loved it!</option>
+          <option value="4">4 &#9734; - I Liked it!</option>
+          <option value="3">3 &#9734; - Good</option>
+          <option value="2">2 &#9734; - It was OK</option>
+          <option value="1">1 &#9734; - Not good</option>
+        </select>
+        <br>
+        <label aria-label="label-comments">Comments:</label>
+        <textarea type="text" name="comment" id="txt-comment" aria-labelledby="label-comments"></textarea>
+        <br>
+        <button onclick="submitReview()">&#65291; Add Review</button>
+      </form>
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
+    <!-- Notification messages -->
+    <section id="notifications"></section>
   </main>
   <!-- End main -->
 
@@ -86,4 +109,5 @@
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6GqkuU1bLiv1Xyapf8zPqIvZPpvgXstE&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
 </body>
+
 </html>

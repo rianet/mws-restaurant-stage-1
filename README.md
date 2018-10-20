@@ -11,6 +11,12 @@ For Stage 2 we focused on performance, we fetch Restaurants from API and used in
 `Performance: >70`
 `Accessibility: >90`
 
+## Project Stage 2
+For Stage 3 we focused on performance as well, we added the hability to mark a Restaurants as favorite. The user can add a restaurant review even when offline, we sync up with the server once the user is back online. Following scores target should be met with Lighthouse audit:
+`Progressive Web App: >90`
+`Performance: >90`
+`Accessibility: >90`
+
 ## Running this Project
 
 ### Prerequisites

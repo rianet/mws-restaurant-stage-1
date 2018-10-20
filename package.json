@@ -4,6 +4,7 @@
   "description": "Discover and review the greatest restaurants in your area",
   "main": "sw.js",
   "scripts": {
+    "serve": "python -m SimpleHTTPServer 8000",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -71,22 +71,24 @@ showCachedRestaurants = () => {
   DBHelper._dbPromise.then((db) => {
     if (!db) return;
 
-    var index = db.transaction('restaurants')
+    let index = db.transaction('restaurants')
       .objectStore('restaurants');
 
     index.getAll().then((data) => {
-      if(data.length){
+      if (data.length) {
         DBHelper.restaurantData = data;
         fetchCuisines();
         fetchNeighborhoods();
         updateRestaurants();
-      }else{
-         // If no cached data on indexedDB fetch from server
+      } else {
+        // If no cached data on indexedDB fetch from server
         DBHelper.fetchRestaurants().then(() => {
           fetchCuisines();
           fetchNeighborhoods();
           updateRestaurants();
         });
+
+        DBHelper.fetchReviews();
       }
     });
   });
@@ -154,11 +156,35 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   addMarkersToMap();
 };
 
+favoriteRestaurant = (event) => {
+  DBHelper.favoriteRestaurant(event.target.restaurant).then(response => {
+    if (response.is_favorite) {
+      DBHelper.showNotification(`Restaurant ${response.name} is now your favorite!`);
+      event.target.classList.add('favorite-button-selected');
+      event.target.parentElement.classList.add('favorite-restaurant');
+    } else {
+      DBHelper.showNotification(`Restaurant ${response.name} no longer your favorite`);
+      event.target.classList.remove('favorite-button-selected');
+      event.target.parentElement.classList.remove('favorite-restaurant');
+    }
+  });
+};
+
 /**
  * Create restaurant HTML.
  */
 createRestaurantHTML = restaurant => {
   const li = document.createElement('li');
+  (restaurant.is_favorite) ? li.classList.add('favorite-restaurant') : li.classList.remove('favorite-restaurant');
+
+  const favorite = document.createElement('span');
+  favorite.innerHTML = '❤';
+  favorite.classList.add('favorite-button');
+  favorite.setAttribute('aria-label', `Mark restaurant ${restaurant.name} as favorite`);
+  (restaurant.is_favorite) ? favorite.classList.add('favorite-button-selected') : favorite.classList.remove('favorite-button-selected');
+  favorite.restaurant = restaurant;
+  favorite.addEventListener('click', favoriteRestaurant, false);
+  li.append(favorite);
 
   li.append(createImg(restaurant));
 

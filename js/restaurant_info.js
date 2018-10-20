@@ -1,4 +1,4 @@
-let restaurant;
+let restaurant, review;
 var map;
 DBHelper._dbPromise = DBHelper.openDatabase();
 
@@ -20,6 +20,15 @@ window.initMap = () => {
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
+  // Fetch restaurant reviews
+  fetchReviewsFromURL((error, reviews) => {
+    if (error) {
+      // Got an error!
+      console.error(error);
+    } else {
+      fillReviewsHTML();
+    }
+  });
 };
 
 /**
@@ -27,7 +36,7 @@ window.initMap = () => {
  */
 fetchRestaurantFromURL = callback => {
   DBHelper._dbPromise.then((db) => {
-    var index = db.transaction('restaurants')
+    let index = db.transaction('restaurants')
       .objectStore('restaurants');
 
     index.getAll().then((data) => {
@@ -35,17 +44,35 @@ fetchRestaurantFromURL = callback => {
       const id = getParameterByName('id');
       self.restaurant = DBHelper.fetchRestaurantById(id);
       callback(null, self.restaurant);
-      fillRestaurantHTML();   
+      fillRestaurantHTML();
     });
   });
 };
+
+/**
+ * Get current restaurant from page URL.
+ */
+fetchReviewsFromURL = callback => {
+  DBHelper._dbPromise.then((db) => {
+    let index = db.transaction('reviews')
+      .objectStore('reviews');
+
+    index.getAll().then((data) => {
+      DBHelper.reviewsData = data;
+      const restaurantId = getParameterByName('id');
+      self.reviews = DBHelper.fetchReviewsByRestaurantId(restaurantId);
+      callback(null, self.reviews);
+    });
+  });
+};
+
 
 /**
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
-  name.innerHTML = restaurant.name;
+  name.innerHTML = restaurant.name + '<span id="details-favorite-btn">❤</span>';
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
@@ -69,8 +96,22 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
+  setFavoriteStyles(restaurant);
+};
+
+/**
+ * Set favorite styles
+ */
+setFavoriteStyles = (restaurant) => {
+  const container = document.getElementById('restaurant-container');
+  const favorite = document.getElementById('details-favorite-btn');
+  if (restaurant.is_favorite) {
+    container.classList.add('details-favorite-restaurant');
+    favorite.style.display = 'block';
+  } else {
+    container.classList.remove('details-favorite-restaurant');
+    favorite.style.display = 'none';
+  }
 };
 
 /**
@@ -98,7 +139,7 @@ fillRestaurantHoursHTML = (
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -128,7 +169,7 @@ createReviewHTML = review => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.updatedAt).toLocaleDateString();
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -169,3 +210,98 @@ getParameterByName = (name, url) => {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 };
+
+/**
+ * Mark restaurant as favorite.
+ */
+favoriteRestaurant = () => {
+  DBHelper.favoriteRestaurant(self.restaurant).then(response => {
+    setFavoriteStyles(response);
+    if (response.is_favorite) {
+      DBHelper.showNotification(`Restaurant ${response.name} is now your favorite!`);
+    } else {
+      DBHelper.showNotification(`Restaurant ${response.name} no longer your favorite`);
+    }
+  });
+};
+
+/*
+ * Display review form to add restaurant raiting
+ */
+showReviewForm = () => {
+  document.getElementById('review-form').style.display = 'block';
+  document.getElementById('btn-show-review-form').style.display = 'none';
+};
+
+/*
+ * Get selected raiting
+ */
+getSelectedRaiting = () => {
+  const cSelect = document.getElementById('select-raiting');
+  const cIndex = cSelect.selectedIndex;
+  return cSelect[cIndex].value;
+};
+
+/*
+ * Append new entered restaurant review to list of reviews
+ */
+appendReviewHTML = (review) => {
+  const container = document.getElementById('reviews-container');
+  const ul = document.getElementById('reviews-list');
+  ul.appendChild(createReviewHTML(review));
+  container.appendChild(ul);
+};
+
+/*
+ * Submit a review and store it on indexedDB first
+ */
+submitReview = () => {
+  event.preventDefault();
+  review = {
+    'id': Date.now(),
+    'restaurant_id': getParameterByName('id'),
+    'name': document.getElementById('txt-name').value,
+    'rating': getSelectedRaiting(),
+    'comments': document.getElementById('txt-comment').value,
+    'createdAt': Date.now(),
+    'updatedAt': Date.now(),
+    // Set flag to check if added while offline, to later update when online
+    'syncUp': !navigator.onLine
+  }
+
+  DBHelper.storeReviewIDB(review).then(response => {
+    DBHelper.showNotification('Your review was added!');
+    document.getElementById('review-form').reset();
+    document.getElementById('review-form').style.display = 'none';
+    document.getElementById('btn-show-review-form').style.display = 'block';
+    self.reviews.push(review);
+    appendReviewHTML(review);
+  });
+};
+
+/*
+ * Get list of not sync up reviews with server
+ */
+getReviewsToSyncUp = () => {
+  return self.reviews.filter(review => review.syncUp === false);
+};
+
+/*
+ * Listens when the window has loaded
+ */
+window.addEventListener('load', () => {
+  // Check if app is online
+  window.addEventListener('online', () => {
+    const reviewsToPost = this.getReviewsToSyncUp();
+    // Check if there are reviews pending to sync up (in case of added while offline)
+    if (reviewsToPost.length > 0) {
+      DBHelper.showNotification('Back online and syncronizing your unsaved data!');
+      // Post pending reviews to be sync up
+      DBHelper.syncUpReviews(reviewsToPost);
+    }
+  });
+  // Check if app is offline and inform user
+  window.addEventListener('offline', () => {
+    DBHelper.showNotification('You are offline we\'ll sync up your data when back online!');
+  });
+});
