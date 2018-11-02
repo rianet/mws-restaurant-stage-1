@@ -11,7 +11,7 @@ For Stage 2 we focused on performance, we fetch Restaurants from API and used in
 `Performance: >70`
 `Accessibility: >90`
 
-## Project Stage 2
+## Project Stage 3
 For Stage 3 we focused on performance as well, we added the hability to mark a Restaurants as favorite. The user can add a restaurant review even when offline, we sync up with the server once the user is back online. Following scores target should be met with Lighthouse audit:
 `Progressive Web App: >90`
 `Performance: >90`
@@ -35,8 +35,14 @@ In order to make APIs work correctly:
 
 ### Frontend Development server
 1. Run `npm install` to include the dependencies in the project
-2. To run the server in the terminal check the version of Python you have: `python -V`. If you have Python 2.x, spin up the server with `python -m SimpleHTTPServer 8000` (or some other port, if port 8000 is already in use.) For Python 3.x, you can use `python3 -m http.server 8000`. If you don't have Python installed, navigate to Python's [website](https://www.python.org/) to download and install the software.
-3. With your server running, visit the site: `http://localhost:8000` to see app in action
+2. Replace google map API KEY on index.html and restaurant.html
+3. To run the server in the terminal check the version of Python you have: `python -V`. If you have Python 2.x, spin up the server with `python -m SimpleHTTPServer 8000` (or some other port, if port 8000 is already in use.) For Python 3.x, you can use `python3 -m http.server 8000`. If you don't have Python installed, navigate to Python's [website](https://www.python.org/) to download and install the software.
+4. With your server running, visit the site: `http://localhost:8000` to see app in action
+
+### Frontend Production build
+1. Run `gulp` 
+2. cd dist/ 
+3. run `python -m SimpleHTTPServer 8000`
 
 
 

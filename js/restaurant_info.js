@@ -72,7 +72,7 @@ fetchReviewsFromURL = callback => {
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
-  name.innerHTML = restaurant.name + '<span id="details-favorite-btn">❤</span>';
+  name.innerHTML = restaurant.name + '<span id="details-favorite-btn" role="button" aria-label="Favorite restaurant">❤</span>';
 
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
