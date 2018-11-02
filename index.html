@@ -23,6 +23,12 @@
 
   <main id="maincontent">
     <section id="map-container">
+      <picture id="mapImg" onclick="showMap()">
+        <source id="source-webp" type="image/webp" srcset="img/map.webp">
+        </source>
+        <img src="img/map.png" alt="Map with restaurants" sizes="(max-width: 960px) 50vw, 100vw" srcset="img/map-400.png 400w, img/map-800.png 800w" />
+      </picture>
+
       <div id="map" role="presentation" aria-label="Map with restaurants"></div>
     </section>
     <section>
@@ -43,7 +49,8 @@
   <script type="application/javascript" charset="utf-8" src="js/idb.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6GqkuU1bLiv1Xyapf8zPqIvZPpvgXstE&libraries=places&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=API_KEY
+  &libraries=places"></script>
   <script type="application/javascript" charset="utf-8" src="js/offline.js"></script>
 
   <footer id="footer">

@@ -50,7 +50,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
+initMap = () => {
   let loc = {
     lat: 40.722216,
     lng: -73.987501
@@ -60,8 +60,6 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-
-  showCachedRestaurants();
 };
 
 /**
@@ -153,7 +151,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
-  addMarkersToMap();
+  // addMarkersToMap();
 };
 
 favoriteRestaurant = (event) => {
@@ -180,6 +178,7 @@ createRestaurantHTML = restaurant => {
   const favorite = document.createElement('span');
   favorite.innerHTML = '❤';
   favorite.classList.add('favorite-button');
+  favorite.setAttribute('role', 'button');
   favorite.setAttribute('aria-label', `Mark restaurant ${restaurant.name} as favorite`);
   (restaurant.is_favorite) ? favorite.classList.add('favorite-button-selected') : favorite.classList.remove('favorite-button-selected');
   favorite.restaurant = restaurant;
@@ -243,4 +242,15 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     });
     self.markers.push(marker);
   });
+};
+
+window.addEventListener('load', () => {
+  showCachedRestaurants();
+});
+
+showMap = () => {
+  document.getElementById('map').style.display = 'block';
+  document.getElementById('mapImg').style.display = 'none';
+  initMap();
+  addMarkersToMap();
 };
